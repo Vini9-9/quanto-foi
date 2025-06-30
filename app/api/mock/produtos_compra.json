@@ -1,0 +1,122 @@
+[
+    {
+        "id": "01",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7896283800818",
+        "descricao": "LTE DESN JUSSARA 1L",
+        "preco": 4.69
+    },
+    {
+        "id": "02",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7898936507457",
+        "descricao": "OVO BCO EXTRA 20UN",
+        "preco": 12.9
+    },
+    {
+        "id": "03",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7896002300125",
+        "descricao": "PAO CAS/AQUI NUT 350G",
+        "preco": 11.9
+    },
+    {
+        "id": "04",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7893000349232",
+        "descricao": "CR AV NUTELLA 140G",
+        "preco": 13.3
+    },
+    {
+        "id": "05",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7896002301249",
+        "descricao": "PAC DA COL 210G ACUC",
+        "preco": 7.59
+    },
+    {
+        "id": "06",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7898191455116",
+        "descricao": "MILHO PIP YOKI 400G",
+        "preco": 7.59
+    },
+    {
+        "id": "07",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7898937413082",
+        "descricao": "CH TORT 15,5G BRIGAD",
+        "preco": 1.59
+    },
+    {
+        "id": "08",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7896004002359",
+        "descricao": "CH NEU 80G 40% CACAU",
+        "preco": 5.29
+    },
+    {
+        "id": "09",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7897664171601",
+        "descricao": "SBT ALB 85G FEM AZUL",
+        "preco": 1.59
+    },
+    {
+        "id": "10",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7897664171701",
+        "descricao": "SBT ALB 85G FEM AZUL",
+        "preco": 1.59
+    },
+    {
+        "id": "11",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7896029022276",
+        "descricao": "PEDIGREE 100G COR/MO",
+        "preco": 2.59
+    },
+    {
+        "id": "12",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7896029022362",
+        "descricao": "PEDIGREE 100G C/M RP",
+        "preco": 2.59
+    },
+    {
+        "id": "13",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7896117681067",
+        "descricao": "PATE C GOSTA 170G A2",
+        "preco": 2.59
+    },
+    {
+        "id": "14",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7896009411449",
+        "descricao": "SUCO C LGO 1L UVA",
+        "preco": 8.25
+    },
+    {
+        "id": "15",
+        "data_hora": "29/06/2025 - 19:44",
+        "local": "ASSAÍ - Terminal",
+        "sku": "7898956274067",
+        "descricao": "P H MAX 30H L12 P11",
+        "preco": 14.9
+    }
+]

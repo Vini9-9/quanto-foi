@@ -1,0 +1,8 @@
+console.log("Para usar o scanner de código de barras, instale a biblioteca ZXing:")
+console.log("npm install @zxing/library")
+console.log("")
+console.log("A biblioteca ZXing fornece:")
+console.log("- Leitura de códigos de barras e QR codes")
+console.log("- Suporte para múltiplos formatos")
+console.log("- Funciona diretamente no navegador")
+console.log("- Acesso à câmera do dispositivo")
