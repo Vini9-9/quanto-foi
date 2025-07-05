@@ -10,27 +10,12 @@ import BarcodeScanner from "./components/BarcodeScanner"
 import type { ProductResponse, Purchase } from "./lib/types"
 import SearchBar from "./components/SearchBar"
 import { formatarValorToBR } from "./utils/utils"
+import PurchaseHistoryModal from "./PurchaseHistoryModal"
 
 const mockPurchases: ProductResponse = {
   produtos: [
     {
         "id": "01",
-        "data": "29/06/2025",
-        "local": "ASSAÍ - Terminal",
-        "sku": "7896283800818",
-        "descricao": "LTE DESN JUSSARA 1L",
-        "preco": 4.69
-    },
-    {
-        "id": "01",
-        "data": "29/06/2025",
-        "local": "ASSAÍ - Terminal",
-        "sku": "7896283800818",
-        "descricao": "LTE DESN ITAM 1L",
-        "preco": 4.69
-    },
-    {
-        "id": "02",
         "data": "29/06/2025",
         "local": "ASSAÍ - Terminal",
         "sku": "7896283800818",
@@ -91,6 +76,7 @@ export default function Home() {
   const [isScannerOpen, setIsScannerOpen] = useState(false)
   const [purchases, setPurchases] = useState<Purchase[]>(mockPurchases.produtos);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
   useEffect(() => {
     const loadPurchases = async () => {
@@ -128,6 +114,26 @@ export default function Home() {
     }
   })
 
+  // Adicione esta função após as funções de filtro existentes (antes do return):
+
+// Organize purchases by date
+const purchasesByDate = purchases.reduce((acc, purchase) => {
+  if (!acc[purchase.data]) {
+    acc[purchase.data] = [];
+  }
+  acc[purchase.data].push(purchase);
+  return acc;
+}, {} as Record<string, Purchase[]>);
+
+// Sort dates in descending order (most recent first)
+const sortedDates = Object.keys(purchasesByDate).sort((a, b) => {
+  // Convert Brazilian date format (DD/MM/YYYY) for comparison
+  const [dayA, monthA, yearA] = a.split('/');
+  const [dayB, monthB, yearB] = b.split('/');
+  return new Date(+yearB, +monthB - 1, +dayB).getTime() - 
+         new Date(+yearA, +monthA - 1, +dayA).getTime();
+});
+
   // Get purchases for selected product
   const selectedProductPurchases = purchases.filter((p) => p.descricao === selectedProduct)
 
@@ -160,9 +166,22 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Quanto foi?</h1>
-          <p className="text-gray-600">Acompanhe suas compras e compare com os preços atuais do mercado</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Quanto foi?</h1>
+              <p className="text-gray-600">Acompanhe suas compras e compare com os preços atuais do mercado</p>
+            </div>
+            
+            <button 
+              onClick={() => setIsHistoryModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <Calendar className="h-4 w-4" />
+              Histórico de Compras
+            </button>
+          </div>
         </div>
+
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -292,6 +311,14 @@ export default function Home() {
         isOpen={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
         onScanResult={handleBarcodeScanned}
+      />
+
+      {/* Purchase History Modal */}
+      <PurchaseHistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        purchasesByDate={purchasesByDate}
+        sortedDates={sortedDates}
       />
     </div>
   )
