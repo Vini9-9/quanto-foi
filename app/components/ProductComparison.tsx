@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, TrendingDown, Calendar, Store, DollarSign, Hash } from "lucide-react"
 import type { Purchase } from "../lib/types"
-import { formatarValorToBR } from "../utils/utils"
+import { formatarDataParaBR, formatarValorToBR } from "../utils/utils"
 
 interface ProductComparisonProps {
   descricao: string
@@ -139,7 +139,7 @@ export default function ProductComparison({ descricao, purchases }: ProductCompa
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-medium">{purchase.data}</p>
+                  <p className="text-sm font-medium">{formatarDataParaBR(purchase.data)}</p>
                   <div className="flex items-center gap-1">
                     {purchase.preco <= currentpreco ? (
                       <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
