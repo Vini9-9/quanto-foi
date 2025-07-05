@@ -14,6 +14,12 @@ export interface ProductData {
   compras: Purchase[]
 }
 
+export interface ProductResponse {
+  filtros_aplicados?: Object
+  total?: number
+  produtos: Purchase[]
+}
+
 export interface precoComparison {
   descricao: string
   sku?: string // Código de barras

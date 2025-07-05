@@ -37,8 +37,8 @@ export default function AddPurchaseForm({ onAddPurchase }: AddPurchaseFormProps)
       descricao: formData.descricao,
       sku: formData.sku || undefined,
       preco: Number.parseFloat(formData.preco),
-      date: formData.date,
-      store: formData.store || "Unknown",
+      data: formData.date,
+      local: formData.store || "-",
     })
 
     setFormData({
@@ -71,7 +71,7 @@ export default function AddPurchaseForm({ onAddPurchase }: AddPurchaseFormProps)
         <CardContent className="pt-6">
           <Button onClick={() => setIsOpen(true)} className="w-full" variant="outline">
             <Plus className="h-4 w-4 mr-2" />
-            Add New Purchase
+            Adiconar Nova Compra
           </Button>
         </CardContent>
       </Card>
@@ -82,12 +82,12 @@ export default function AddPurchaseForm({ onAddPurchase }: AddPurchaseFormProps)
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Add New Purchase</CardTitle>
+          <CardTitle>Adicionar Nova Compra</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="descricao">Product Name</Label>
+              <Label htmlFor="descricao">Nome do produto</Label>
               <Input
                 id="descricao"
                 value={formData.descricao}
@@ -123,7 +123,7 @@ export default function AddPurchaseForm({ onAddPurchase }: AddPurchaseFormProps)
             </div>
 
             <div>
-              <Label htmlFor="preco">preco ($)</Label>
+              <Label htmlFor="preco">Preço (R$)</Label>
               <Input
                 id="preco"
                 type="number"
@@ -136,7 +136,7 @@ export default function AddPurchaseForm({ onAddPurchase }: AddPurchaseFormProps)
             </div>
 
             <div>
-              <Label htmlFor="date">Purchase Date</Label>
+              <Label htmlFor="date">Data da compra</Label>
               <Input
                 id="date"
                 type="date"
@@ -147,21 +147,21 @@ export default function AddPurchaseForm({ onAddPurchase }: AddPurchaseFormProps)
             </div>
 
             <div>
-              <Label htmlFor="store">Store (Optional)</Label>
+              <Label htmlFor="store">Loja/local</Label>
               <Input
                 id="store"
                 value={formData.store}
                 onChange={(e) => handleInputChange("store", e.target.value)}
-                placeholder="e.g., Amazon, Best Buy"
+                placeholder="e.g., Assaí, COOP"
               />
             </div>
 
             <div className="flex gap-2">
               <Button type="submit" className="flex-1">
-                Add Purchase
+                Adicionar
               </Button>
               <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                Cancel
+                Cancelar
               </Button>
             </div>
           </form>

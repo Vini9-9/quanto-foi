@@ -1,30 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, DollarSign, Calendar, Hash } from "lucide-react"
 import ProductComparison from "./components/ProductComparison"
 import AddPurchaseForm from "./components/AddPurchaseForm"
 import BarcodeScanner from "./components/BarcodeScanner"
-import type { Purchase } from "./lib/types"
+import type { ProductResponse, Purchase } from "./lib/types"
 import SearchBar from "./components/SearchBar"
 import { formatarValorToBR } from "./utils/utils"
-// import * as data from '../app/api/mock/produtos_compra.json'
 
-// Mock data for demonstration - atualizar comentários
-// const mockPurchases: Purchase[] = [
-//   {
-//     id: "1",
-//     descricao: "iPhone 15 Pro",
-//     sku: "7891234567890", // Código de barras
-//     preco: 999,
-//     date: "2024-01-15",
-//     store: "Apple Store",
-//   }
-// ]
-// const mockPurchases: Purchase[] = data;
-const mockPurchases: Purchase[] = [
+const mockPurchases: ProductResponse = {
+  produtos: [
     {
         "id": "01",
         "data": "29/06/2025",
@@ -65,16 +53,59 @@ const mockPurchases: Purchase[] = [
         "descricao": "OVO BCO EXTRA 20UN",
         "preco": 12.9
     }
-  ];
+]};
 
-console.log('mockPurchases', mockPurchases);
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+const fetchPurchases = async (): Promise<ProductResponse> => {
+  try {
+    console.log('Iniciando requisição para:', `${API_URL}/produtos`);
+    
+    const response = await fetch(`${API_URL}/produtos`, {
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+
+    console.log('Resposta recebida, status:', response.status);
+
+    if (!response.ok) {
+      throw new Error(`Erro HTTP: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Dados recebidos:', data);
+    return data;
+
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    console.warn('Retornando dados mockados como fallback');
+    return mockPurchases;
+  }
+};
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [purchases, setPurchases] = useState<Purchase[]>(mockPurchases)
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
   const [searchType, setSearchType] = useState<"name" | "sku" | "both">("both")
   const [isScannerOpen, setIsScannerOpen] = useState(false)
+  const [purchases, setPurchases] = useState<Purchase[]>(mockPurchases.produtos);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const loadPurchases = async () => {
+      setIsLoading(true);
+      const data = await fetchPurchases();
+      setPurchases(data.produtos);
+      setIsLoading(false);
+    };
+
+    loadPurchases();
+  }, []);
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
 
   // Get unique product names
   const uniqueProducts = Array.from(new Set(purchases.map((p) => p.descricao)))
