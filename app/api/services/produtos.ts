@@ -1,6 +1,8 @@
+import { Purchase } from "@/app/lib/types";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-const updateProductDescription = async (sku: string, newDescription: string): Promise<boolean> => {
+export async function updateProductDescription(sku: string, newDescription: string): Promise<boolean> {
   try {
     const response = await fetch(`${API_URL}/produtos/${sku}/descricao`, {
       method: 'PATCH',
@@ -27,4 +29,33 @@ const updateProductDescription = async (sku: string, newDescription: string): Pr
   }
 };
 
-export default updateProductDescription;
+export async function createProduct(compra: Omit<Purchase, "id">): Promise<Purchase | void> {
+  try {
+    const response = await fetch(`${API_URL}/produtos`, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data: compra.data,
+        local: compra.local,
+        descricao: compra.descricao,
+        sku: compra.sku,
+        preco: compra.preco
+      })
+    });
+
+    if (!response.ok) {
+      console.error(`Erro ao criar produto: ${response.status}`);
+      return
+    }
+
+    const data = await response.json();
+    console.log('Produto criado com sucesso:', data);
+    return data;
+  } catch (error) {
+    console.error('Erro na requisição de criação:', error);
+    return
+  }
+};

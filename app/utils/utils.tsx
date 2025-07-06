@@ -8,16 +8,19 @@ export function formatarValorToBR(valor: number): string {
 }
 
 export function formatarDataParaBR(dataString: string): string {
-  const data = new Date(dataString);
-  
-  // Verifica se a data é inválida
-  if (isNaN(data.getTime())) {
-    throw new Error('Data inválida');
+  // Verifica se a string está no formato esperado (YYYY-MM-dd)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dataString)) {
+    throw new Error('Formato de data inválido. Use YYYY-MM-dd');
   }
 
-  const dia = String(data.getDate()).padStart(2, '0');
-  const mes = String(data.getMonth() + 1).padStart(2, '0');
-  const ano = data.getFullYear();
+  // Divide a string em partes
+  const partes = dataString.split('-');
+  const ano = partes[0];
+  const mes = partes[1];
+  const dia = partes[2];
+
+  // Retorna no formato dd/MM/yyyy
+  console.log(dataString, `${dia}/${mes}/${ano}`)
 
   return `${dia}/${mes}/${ano}`;
 }

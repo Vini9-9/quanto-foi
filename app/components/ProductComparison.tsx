@@ -6,7 +6,7 @@ import { TrendingUp, TrendingDown, Calendar, Store, DollarSign, Hash } from "luc
 import type { Purchase } from "../lib/types"
 import { formatarDataParaBR, formatarValorToBR } from "../utils/utils"
 import { useState } from "react"
-import updateProductDescription from "../api/services/produtos"
+import { updateProductDescription } from "../api/services/produtos"
 
 interface ProductComparisonProps {
   descricao: string

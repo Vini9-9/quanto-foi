@@ -11,6 +11,7 @@ import type { ProductResponse, Purchase } from "./lib/types"
 import SearchBar from "./components/SearchBar"
 import { formatarValorToBR } from "./utils/utils"
 import PurchaseHistoryModal from "./PurchaseHistoryModal"
+import { createProduct } from "./api/services/produtos"
 
 const mockPurchases: ProductResponse = {
   produtos: [
@@ -142,12 +143,13 @@ const sortedDates = Object.keys(purchasesByDate).sort((a, b) => {
   const uniqueProductCount = uniqueProducts.length
   const averagepreco = totalSpent / purchases.length
 
-  const handleAddPurchase = (purchase: Omit<Purchase, "id">) => {
-    const newPurchase: Purchase = {
-      ...purchase,
-      id: Date.now().toString(),
-    }
-    setPurchases([...purchases, newPurchase])
+  const handleAddPurchase = async (purchase: Omit<Purchase, "id">) => {
+    const newPurchase = await createProduct(purchase)
+    if (newPurchase) {
+      setPurchases([...purchases, newPurchase])
+      } else {
+        alert("Não foi possível atualizar a descrição. Tente novamente.");
+      }
   }
 
   const handleBarcodeScanned = (barcode: string) => {
