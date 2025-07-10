@@ -39,6 +39,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ## TODOS
 
 - [x] Histórico de compras por dia - API OK 
-- [] Editar descrição por SKU - API OK
+- [x] Editar descrição por SKU - API OK
 - [] Adicionar produtos em lote - API + OU - 
 - [] Imagem produto 

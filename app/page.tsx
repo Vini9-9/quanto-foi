@@ -7,68 +7,11 @@ import { TrendingUp, DollarSign, Calendar, Hash } from "lucide-react"
 import ProductComparison from "./components/ProductComparison"
 import AddPurchaseForm from "./components/AddPurchaseForm"
 import BarcodeScanner from "./components/BarcodeScanner"
-import type { ProductResponse, Purchase } from "./lib/types"
+import type { Purchase } from "./lib/types"
 import SearchBar from "./components/SearchBar"
 import { formatarValorToBR } from "./utils/utils"
 import PurchaseHistoryModal from "./PurchaseHistoryModal"
-import { createProduct } from "./api/services/produtos"
-
-const mockPurchases: ProductResponse = {
-  produtos: [
-    {
-        "id": "01",
-        "data": "29/06/2025",
-        "local": "ASSAÍ - Terminal",
-        "sku": "7896283800818",
-        "descricao": "LTE DESN JUSSARA 1L",
-        "preco": 4.69
-    },
-    {
-        "id": "03",
-        "data": "29/06/2025",
-        "local": "ASSAÍ - Terminal",
-        "sku": "7896283800818",
-        "descricao": "LTE DESN JUSSARA 1L",
-        "preco": 4.69
-    },
-    {
-        "id": "02",
-        "data": "29/06/2025",
-        "local": "ASSAÍ - Terminal",
-        "sku": "7898936507457",
-        "descricao": "OVO BCO EXTRA 20UN",
-        "preco": 12.9
-    }
-]};
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-const fetchPurchases = async (): Promise<ProductResponse> => {
-  try {
-    console.log('Iniciando requisição para:', `${API_URL}/produtos`);
-    
-    const response = await fetch(`${API_URL}/produtos`, {
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
-
-    console.log('Resposta recebida, status:', response.status);
-
-    if (!response.ok) {
-      throw new Error(`Erro HTTP: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log('Dados recebidos:', data);
-    return data;
-
-  } catch (error) {
-    console.error('Erro na requisição:', error);
-    console.warn('Retornando dados mockados como fallback');
-    return mockPurchases;
-  }
-};
+import { createProduct, fetchPurchases, mockPurchases } from "./api/services/produtos"
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -95,27 +38,53 @@ export default function Home() {
   }
 
   // Get unique product names
-  const uniqueProducts = Array.from(new Set(purchases.map((p) => p.descricao)))
+  // const uniqueProducts = Array.from(new Set(purchases.map((p) => p.descricao)))
+
+  const productsBySku = purchases.reduce((acc, purchase) => {
+  if (!acc[purchase.sku]) {
+    acc[purchase.sku] = purchase;
+  }
+  return acc;
+}, {} as Record<string, Purchase>);
+
+const uniqueProducts = Object.values(productsBySku);
 
   // Filter products based on search
-  const filteredProducts = uniqueProducts.filter((product) => {
-    const productPurchases = purchases.filter((p) => p.descricao === product)
-    const productSku = productPurchases[0]?.sku || ""
+  // const filteredProducts = uniqueProducts.filter((product) => {
+  //   const productPurchases = purchases.filter((p) => p.descricao === product)
+  //   const productSku = productPurchases[0]?.sku || ""
 
-    const searchLower = searchTerm.toLowerCase()
+  //   const searchLower = searchTerm.toLowerCase()
+
+  //   switch (searchType) {
+  //     case "name":
+  //       return product.toLowerCase().includes(searchLower)
+  //     case "sku":
+  //       return productSku.toLowerCase().includes(searchLower)
+  //     case "both":
+  //     default:
+  //       return product.toLowerCase().includes(searchLower) || productSku.toLowerCase().includes(searchLower)
+  //   }
+  // })
+
+  // Substitua a função filteredProducts por:
+  const filteredProducts = uniqueProducts.filter((product) => {
+    const searchLower = searchTerm.toLowerCase();
 
     switch (searchType) {
       case "name":
-        return product.toLowerCase().includes(searchLower)
+        return product.descricao.toLowerCase().includes(searchLower);
       case "sku":
-        return productSku.toLowerCase().includes(searchLower)
+        return product.sku.toLowerCase().includes(searchLower);
       case "both":
       default:
-        return product.toLowerCase().includes(searchLower) || productSku.toLowerCase().includes(searchLower)
+        return (
+          product.descricao.toLowerCase().includes(searchLower) ||
+          product.sku.toLowerCase().includes(searchLower)
+        );
     }
-  })
+  });
 
-  // Adicione esta função após as funções de filtro existentes (antes do return):
 
 // Organize purchases by date
 const purchasesByDate = purchases.reduce((acc, purchase) => {
@@ -128,15 +97,14 @@ const purchasesByDate = purchases.reduce((acc, purchase) => {
 
 // Sort dates in descending order (most recent first)
 const sortedDates = Object.keys(purchasesByDate).sort((a, b) => {
-  // Convert Brazilian date format (DD/MM/YYYY) for comparison
-  const [dayA, monthA, yearA] = a.split('/');
-  const [dayB, monthB, yearB] = b.split('/');
-  return new Date(+yearB, +monthB - 1, +dayB).getTime() - 
-         new Date(+yearA, +monthA - 1, +dayA).getTime();
+  return b.localeCompare(a);
 });
 
   // Get purchases for selected product
-  const selectedProductPurchases = purchases.filter((p) => p.descricao === selectedProduct)
+  const selectedProductPurchases = purchases.filter((p) => {
+    const product = uniqueProducts.find(prod => prod.descricao === selectedProduct);
+    return product ? p.sku === product.sku : false;
+  });
 
   // Calculate statistics
   const totalSpent = purchases.reduce((sum, purchase) => sum + purchase.preco, 0)
@@ -171,7 +139,7 @@ const sortedDates = Object.keys(purchasesByDate).sort((a, b) => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">Quanto foi?</h1>
-              <p className="text-gray-600">Acompanhe suas compras e compare com os preços atuais do mercado</p>
+              <p className="text-gray-600">Acompanhe suas compras e compare com os preços que já pagou</p>
             </div>
             
             <button 
@@ -239,25 +207,24 @@ const sortedDates = Object.keys(purchasesByDate).sort((a, b) => {
               <CardContent>
                 <div className="space-y-2">
                   {filteredProducts.map((product) => {
-                    const productPurchases = purchases.filter((p) => p.descricao === product)
-                    const totalSpentOnProduct = productPurchases.reduce((sum, p) => sum + p.preco, 0)
-                    const productSku = productPurchases[0]?.sku
+                    const productPurchases = purchases.filter((p) => p.sku === product.sku);
+                    const totalSpentOnProduct = productPurchases.reduce((sum, p) => sum + p.preco, 0);
 
                     return (
                       <div
-                        key={product}
+                        key={product.sku}
                         className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                          selectedProduct === product ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
+                          selectedProduct === product.descricao ? "bg-blue-50 border-blue-200" : "hover:bg-gray-50"
                         }`}
-                        onClick={() => setSelectedProduct(product)}
+                        onClick={() => setSelectedProduct(product.descricao)}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <h3 className="font-medium text-sm">{product}</h3>
-                            {productSku && (
+                            <h3 className="font-medium text-sm">{product.descricao}</h3>
+                            {product.sku && (
                               <div className="flex items-center gap-1 mt-1">
                                 <Hash className="h-3 w-3 text-muted-foreground" />
-                                <span className="text-xs text-muted-foreground font-mono">{productSku}</span>
+                                <span className="text-xs text-muted-foreground font-mono">{product.sku}</span>
                               </div>
                             )}
                             <p className="text-xs text-muted-foreground mt-1">
@@ -267,9 +234,8 @@ const sortedDates = Object.keys(purchasesByDate).sort((a, b) => {
                           <Badge variant="secondary">R$ {formatarValorToBR(totalSpentOnProduct)}</Badge>
                         </div>
                       </div>
-                    )
+                    );
                   })}
-
                   {filteredProducts.length === 0 && (
                     <p className="text-muted-foreground text-sm text-center py-4">Produto não localizado</p>
                   )}
@@ -293,7 +259,7 @@ const sortedDates = Object.keys(purchasesByDate).sort((a, b) => {
                   </p>
                   <div className="text-sm text-muted-foreground">
                     <p>• Acompanhe seu histórico de compras</p>
-                    <p>• Compare com os preços atuais do mercado</p>
+                    <p>• Compare com os preços que já pagou</p>
                     <p>• Escaneie códigos de barras para uma rápida pesquisa de produtos</p>
                     <p>• Identifique as melhores ofertas e tendências</p>
                   </div>

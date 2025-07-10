@@ -1,7 +1,7 @@
 export interface Purchase {
   id: string
   descricao: string
-  sku?: string // Código de barras do produto
+  sku: string // Código de barras do produto
   preco: number
   data: string
   local: string

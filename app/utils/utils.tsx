@@ -19,8 +19,5 @@ export function formatarDataParaBR(dataString: string): string {
   const mes = partes[1];
   const dia = partes[2];
 
-  // Retorna no formato dd/MM/yyyy
-  console.log(dataString, `${dia}/${mes}/${ano}`)
-
   return `${dia}/${mes}/${ano}`;
 }

@@ -13,24 +13,14 @@ interface ProductComparisonProps {
   purchases: Purchase[]
 }
 
-// Mock current market precos
-const mockCurrentprecos: Record<string, number> = {
-  "iPhone 15 Pro": 899,
-  "MacBook Air M2": 1099,
-  "AirPods Pro": 229,
-}
-
 export default function ProductComparison({ descricao, purchases }: ProductComparisonProps) {
-  const currentpreco = mockCurrentprecos[descricao] || 0
   const sortedPurchases = [...purchases].sort((a, b) => new Date(b.data).getTime() - new Date(a.data).getTime())
   const latestPurchase = sortedPurchases[0]
   const averagePaid = purchases.reduce((sum, p) => sum + p.preco, 0) / purchases.length
   const totalSpent = purchases.reduce((sum, p) => sum + p.preco, 0)
   const skuProduto = purchases[0]?.sku || '';
-
-  const precoDifference = currentpreco - latestPurchase.preco
-  const isCurrentCheaper = precoDifference < 0
-  const savingsVsAverage = averagePaid - currentpreco
+  const precoDifference = latestPurchase.preco - averagePaid
+  const isCurrentCheaper = precoDifference <= 0
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [newDescription, setNewDescription] = useState(descricao);
   
@@ -52,7 +42,7 @@ export default function ProductComparison({ descricao, purchases }: ProductCompa
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5" />
               <div>
-                <div>{newDescription} - Análise de Preços</div>
+                <div>{descricao} - Análise de Preços</div>
                 {skuProduto && (
                   <div className="flex items-center gap-1 text-sm font-normal text-muted-foreground">
                     <Hash className="h-3 w-3" />
@@ -73,8 +63,8 @@ export default function ProductComparison({ descricao, purchases }: ProductCompa
        <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-muted-foreground">Preço de Mercado Atual</p>
-            <p className="text-2xl font-bold text-blue-600">R$ {formatarValorToBR(currentpreco)}</p>
+            <p className="text-sm text-muted-foreground">Última compra</p>
+            <p className="text-2xl font-bold text-blue-600">R$ {formatarValorToBR(latestPurchase.preco)}</p>
           </div>
 
           <div className="text-center p-4 bg-green-50 rounded-lg">
@@ -92,55 +82,27 @@ export default function ProductComparison({ descricao, purchases }: ProductCompa
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">Comparação de Preços</h3>
-              <p className="text-sm text-muted-foreground">Preço atual vs sua última compra</p>
+              <p className="text-sm text-muted-foreground">Última compra vs seu médio</p>
             </div>
             <div className="flex items-center gap-2">
               {isCurrentCheaper ? (
                 <>
                   <TrendingDown className="h-4 w-4 text-green-500" />
                   <Badge variant="secondary" className="bg-green-100 text-green-800">
-                    R$ {formatarValorToBR(Math.abs(precoDifference))} mais barato agora
+                    R$ {formatarValorToBR(Math.abs(precoDifference))} mais barato
                   </Badge>
                 </>
               ) : (
                 <>
                   <TrendingUp className="h-4 w-4 text-red-500" />
                   <Badge variant="secondary" className="bg-red-100 text-red-800">
-                    R$ {precoDifference} mais caro agora
+                    R$ {formatarValorToBR(Math.abs(precoDifference))} mais caro
                   </Badge>
                 </>
               )}
             </div>
           </div>
         </div>
-
-        {savingsVsAverage !== 0 && (
-          <div className="mt-4 p-4 border rounded-lg">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium">Oportunidade de Economia</h3>
-                <p className="text-sm text-muted-foreground">Preço atual vs seu médio</p>
-              </div>
-              <div className="flex items-center gap-2">
-                {savingsVsAverage > 0 ? (
-                  <>
-                    <TrendingDown className="h-4 w-4 text-green-500" />
-                    <Badge variant="secondary" className="bg-green-100 text-green-800">
-                      Economize R$ {formatarValorToBR(savingsVsAverage)}
-                    </Badge>
-                  </>
-                ) : (
-                  <>
-                    <TrendingUp className="h-4 w-4 text-red-500" />
-                    <Badge variant="secondary" className="bg-red-100 text-red-800">
-                      R$ {Math.abs(savingsVsAverage).toFixed(0)} acima da média
-                    </Badge>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </CardContent>
       </Card>
 
@@ -165,7 +127,7 @@ export default function ProductComparison({ descricao, purchases }: ProductCompa
                 <div className="text-right">
                   <p className="text-sm font-medium">{formatarDataParaBR(purchase.data)}</p>
                   <div className="flex items-center gap-1">
-                    {purchase.preco <= currentpreco ? (
+                    {purchase.preco <= averagePaid ? (
                       <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
                         Boa oferta
                       </Badge>
@@ -182,7 +144,7 @@ export default function ProductComparison({ descricao, purchases }: ProductCompa
         </CardContent>
       </Card>
 
-       {/* Modal de Edição */}
+      {/* Modal de Edição */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg w-full max-w-md p-6">
