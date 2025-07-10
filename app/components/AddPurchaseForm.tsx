@@ -35,7 +35,7 @@ export default function AddPurchaseForm({ onAddPurchase }: AddPurchaseFormProps)
 
     onAddPurchase({
       descricao: formData.descricao,
-      sku: formData.sku || undefined,
+      sku: formData.sku || '-',
       preco: Number.parseFloat(formData.preco),
       data: formData.date,
       local: formData.store || "-",

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Camera, X, Scan, AlertCircle } from "lucide-react"
@@ -16,8 +16,54 @@ export default function BarcodeScanner({ onScanResult, onClose, isOpen }: Barcod
   const videoRef = useRef<HTMLVideoElement>(null)
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null)
+  const [hasPermission] = useState<boolean | null>(null) // Removido setHasPermission
   const codeReader = useRef<BrowserMultiFormatReader | null>(null)
+
+  const initializeScanner = useCallback(async () => {
+    const stop = () => {
+      if (codeReader.current) {
+        codeReader.current.reset()
+        codeReader.current = null
+      }
+      setIsScanning(false)
+    }
+
+    try {
+      if (!videoRef.current) return
+
+      codeReader.current = new BrowserMultiFormatReader()
+      setIsScanning(true)
+      setError(null)
+
+      await codeReader.current.decodeFromVideoDevice(
+        null,
+        videoRef.current,
+        (result, error) => {
+          if (result) {
+            const barcode = result.getText()
+            onScanResult(barcode)
+            stop()
+            onClose()
+          }
+          if (error) {
+            console.error("Error scanning barcode:", error)
+          }
+        }
+      )
+    } catch (err) {
+      console.error("Failed to initialize scanner:", err)
+      setError("Failed to initialize barcode scanner")
+      setIsScanning(false)
+    }
+  }, [onScanResult, onClose]) // No more stopScanning dependency
+
+  const stopScanning = useCallback(() => {
+    if (codeReader.current) {
+      codeReader.current.reset()
+      codeReader.current = null
+    }
+    setIsScanning(false)
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -29,47 +75,47 @@ export default function BarcodeScanner({ onScanResult, onClose, isOpen }: Barcod
     return () => {
       stopScanning()
     }
-  }, [isOpen])
+  }, [isOpen, initializeScanner, stopScanning])
 
-  const initializeScanner = async () => {
-    try {
-      setError(null)
+  // const initializeScanner = async () => {
+  //   try {
+  //     setError(null)
 
-      // Verificar se o navegador suporta getUserMedia
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setError("Seu navegador não suporta acesso à câmera")
-        return
-      }
+  //     // Verificar se o navegador suporta getUserMedia
+  //     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+  //       setError("Seu navegador não suporta acesso à câmera")
+  //       return
+  //     }
 
-      // Solicitar permissão para câmera
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: "environment", // Usar câmera traseira se disponível
-        },
-      })
+  //     // Solicitar permissão para câmera
+  //     const stream = await navigator.mediaDevices.getUserMedia({
+  //       video: {
+  //         facingMode: "environment", // Usar câmera traseira se disponível
+  //       },
+  //     })
 
-      setHasPermission(true)
+  //     setHasPermission(true)
 
-      // Parar o stream temporário
-      stream.getTracks().forEach((track) => track.stop())
+  //     // Parar o stream temporário
+  //     stream.getTracks().forEach((track) => track.stop())
 
-      // Inicializar o leitor de código de barras
-      codeReader.current = new BrowserMultiFormatReader()
-      startScanning()
-    } catch (err) {
-      console.error("Erro ao acessar câmera:", err)
-      setHasPermission(false)
-      if (err instanceof Error) {
-        if (err.name === "NotAllowedError") {
-          setError("Permissão para câmera negada. Por favor, permita o acesso à câmera.")
-        } else if (err.name === "NotFoundError") {
-          setError("Nenhuma câmera encontrada no dispositivo.")
-        } else {
-          setError("Erro ao acessar a câmera: " + err.message)
-        }
-      }
-    }
-  }
+  //     // Inicializar o leitor de código de barras
+  //     codeReader.current = new BrowserMultiFormatReader()
+  //     startScanning()
+  //   } catch (err) {
+  //     console.error("Erro ao acessar câmera:", err)
+  //     setHasPermission(false)
+  //     if (err instanceof Error) {
+  //       if (err.name === "NotAllowedError") {
+  //         setError("Permissão para câmera negada. Por favor, permita o acesso à câmera.")
+  //       } else if (err.name === "NotFoundError") {
+  //         setError("Nenhuma câmera encontrada no dispositivo.")
+  //       } else {
+  //         setError("Erro ao acessar a câmera: " + err.message)
+  //       }
+  //     }
+  //   }
+  // }
 
   const startScanning = async () => {
     if (!codeReader.current || !videoRef.current) return
@@ -79,7 +125,7 @@ export default function BarcodeScanner({ onScanResult, onClose, isOpen }: Barcod
       setError(null)
 
       await codeReader.current.decodeFromVideoDevice(
-        undefined, // Usar câmera padrão
+        null, // Usar câmera padrão
         videoRef.current,
         (result, error) => {
           if (result) {
@@ -102,12 +148,12 @@ export default function BarcodeScanner({ onScanResult, onClose, isOpen }: Barcod
     }
   }
 
-  const stopScanning = () => {
-    if (codeReader.current) {
-      codeReader.current.reset()
-    }
-    setIsScanning(false)
-  }
+  // const stopScanning = () => {
+  //   if (codeReader.current) {
+  //     codeReader.current.reset()
+  //   }
+  //   setIsScanning(false)
+  // }
 
   if (!isOpen) return null
 

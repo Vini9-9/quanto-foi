@@ -15,7 +15,7 @@ export interface ProductData {
 }
 
 export interface ProductResponse {
-  filtros_aplicados?: Object
+  filtros_aplicados?: object
   total?: number
   produtos: Purchase[]
 }
