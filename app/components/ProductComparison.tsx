@@ -6,7 +6,7 @@ import { TrendingUp, TrendingDown, Calendar, Store, DollarSign, Hash } from "luc
 import type { Purchase } from "../lib/types"
 import { formatarDataParaBR, formatarValorToBR } from "../utils/utils"
 import { useState } from "react"
-import { updateProductDescription } from "../api/services/produtos"
+import { fetchImageBySKU, updateProductDescription } from "../api/services/produtos"
 
 interface ProductComparisonProps {
   descricao: string
@@ -60,50 +60,65 @@ export default function ProductComparison({ descricao, purchases }: ProductCompa
             </button>
           </CardTitle>
         </CardHeader>
-       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-muted-foreground">Última compra</p>
-            <p className="text-2xl font-bold text-blue-600">R$ {formatarValorToBR(latestPurchase.preco)}</p>
-          </div>
+        <CardContent>
+          <div className="flex items-center mb-4">
+            {skuProduto && (
+              <div className="mr-4 w-24 h-24 flex-shrink-0">
+                {/* Imagem do produto */}
+                <img 
+                  src={fetchImageBySKU(skuProduto)}
+                  alt={`Imagem de ${descricao}`}
+                  className="w-full h-full object-cover rounded-md"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                  }}
+                />
+              </div>
+            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow">
+              <div className="text-center p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-muted-foreground">Última compra</p>
+                <p className="text-2xl font-bold text-blue-600">R$ {formatarValorToBR(latestPurchase.preco)}</p>
+              </div>
 
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <p className="text-sm text-muted-foreground">Seu Custo Médio</p>
-            <p className="text-2xl font-bold text-green-600">R$ {formatarValorToBR(averagePaid)}</p>
-          </div>
+              <div className="text-center p-4 bg-green-50 rounded-lg">
+                <p className="text-sm text-muted-foreground">Seu Custo Médio</p>
+                <p className="text-2xl font-bold text-green-600">R$ {formatarValorToBR(averagePaid)}</p>
+              </div>
 
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <p className="text-sm text-muted-foreground">Total Gastos</p>
-            <p className="text-2xl font-bold text-purple-600">R$ {formatarValorToBR(totalSpent)}</p>
-          </div>
-        </div>
-
-        <div className="mt-6 p-4 border rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">Comparação de Preços</h3>
-              <p className="text-sm text-muted-foreground">Última compra vs seu médio</p>
-            </div>
-            <div className="flex items-center gap-2">
-              {isCurrentCheaper ? (
-                <>
-                  <TrendingDown className="h-4 w-4 text-green-500" />
-                  <Badge variant="secondary" className="bg-green-100 text-green-800">
-                    R$ {formatarValorToBR(Math.abs(precoDifference))} mais barato
-                  </Badge>
-                </>
-              ) : (
-                <>
-                  <TrendingUp className="h-4 w-4 text-red-500" />
-                  <Badge variant="secondary" className="bg-red-100 text-red-800">
-                    R$ {formatarValorToBR(Math.abs(precoDifference))} mais caro
-                  </Badge>
-                </>
-              )}
+              <div className="text-center p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-muted-foreground">Total Gastos</p>
+                <p className="text-2xl font-bold text-purple-600">R$ {formatarValorToBR(totalSpent)}</p>
+              </div>
             </div>
           </div>
-        </div>
-      </CardContent>
+
+          <div className="mt-6 p-4 border rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">Comparação de Preços</h3>
+                <p className="text-sm text-muted-foreground">Última compra vs seu médio</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {isCurrentCheaper ? (
+                  <>
+                    <TrendingDown className="h-4 w-4 text-green-500" />
+                    <Badge variant="secondary" className="bg-green-100 text-green-800">
+                      R$ {formatarValorToBR(Math.abs(precoDifference))} mais barato
+                    </Badge>
+                  </>
+                ) : (
+                  <>
+                    <TrendingUp className="h-4 w-4 text-red-500" />
+                    <Badge variant="secondary" className="bg-red-100 text-red-800">
+                      R$ {formatarValorToBR(Math.abs(precoDifference))} mais caro
+                    </Badge>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
       </Card>
 
       <Card>

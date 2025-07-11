@@ -1,6 +1,7 @@
 import { ProductResponse, Purchase } from "@/app/lib/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_IMAGES = process.env.NEXT_PUBLIC_API_IMAGES;
 
 export const mockPurchases: ProductResponse = {
   produtos: [
@@ -29,6 +30,8 @@ export const mockPurchases: ProductResponse = {
         "preco": 12.9
     }
 ]};
+
+const mockUrlImageNotFound: string = "https://images.tcdn.com.br/img/img_prod/1053462/carteira_jimmy_victor_hugo_1_5305_variacao_34523_1_5a4430aa2ca35e92b757df5aeb17f61f.png"
 
 export async function updateProductDescription(sku: string, newDescription: string): Promise<boolean> {
   try {
@@ -115,3 +118,11 @@ export async function fetchPurchases(): Promise<ProductResponse> {
   }
 };
 
+export function fetchImageBySKU(sku: string): string {
+  try {
+    return `${API_IMAGES}/${sku}`;
+  } catch (error) {
+    console.error('Erro na requisição:', error);
+    return mockUrlImageNotFound;
+  }
+};
